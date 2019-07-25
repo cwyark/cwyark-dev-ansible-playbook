@@ -4,3 +4,8 @@
     name: "{{ common_apt_packages }}"
     update_cache: yes
   become: yes
+
+- name: Upgrade system deb packages
+  apt:
+    upgrade: safe
+  become: yes
