@@ -1,0 +1,6 @@
+---
+- name: Install system required deb packages
+  apt:
+    name: "{{ common_apt_packages }}"
+    update_cache: yes
+  become: yes

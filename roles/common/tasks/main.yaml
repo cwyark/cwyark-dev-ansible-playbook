@@ -1,0 +1,5 @@
+---
+- import_tasks: system.yaml
+- import_tasks: pyenv.yaml
+- import_tasks: neovim.yaml
+- import_tasks: tmux.yaml

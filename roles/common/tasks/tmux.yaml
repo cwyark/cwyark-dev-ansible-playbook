@@ -1,0 +1,23 @@
+---
+- name: Install tmux
+  apt:
+    name: "tmux"
+    update_cache: yes
+    state: latest
+  become: yes
+
+- name: Install .tmux repo
+  git:
+    repo: https://github.com/gpakosz/.tmux.git
+    dest: "{{ ansible_env.HOME }}/.tmux"
+
+- name: Configure .tmux.conf symbolic link
+  file:
+    src: "{{ ansible_env.HOME }}/.tmux/.tmux.conf"
+    dest: "{{ ansible_env.HOME }}/.tmux.conf"
+    state: link
+
+- name: Copy .tmux.conf.local
+  template:
+    src: tmux.conf.local.j2
+    dest: "{{ ansible_env.HOME }}/.tmux.conf.local"
