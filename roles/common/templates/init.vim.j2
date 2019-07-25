@@ -113,7 +113,12 @@ let g:solarized_underline=0
 let g:solarized_italic=0
 let g:solarized_visibility="low"
 let g:solarized_contrast="high"
-colorscheme solarized
+try
+ colorscheme solarized
+catch /^Vim\%((\a\+)\)\=:E185/
+  colorscheme default
+  set background=dark
+endtry
 "---------------------------------------------
 
 "----------basic key mapping-------------
