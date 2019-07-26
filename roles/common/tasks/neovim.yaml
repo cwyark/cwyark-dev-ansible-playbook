@@ -25,6 +25,7 @@
   apt:
     name: "python3-neovim"
   become: yes
+  when: ansible_distribution == "Ubuntu" and ansible_distribution_release == "bionic"
 
 # Install vim-plug
 - block:
