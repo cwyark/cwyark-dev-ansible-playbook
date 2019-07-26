@@ -22,10 +22,9 @@
     neovim
 
 - name: Install neovim python module
-  pip:
-    name: neovim
-    executable: "{{ pip3_name }}"
-    extra_args: --user
+  apt:
+    name: "python3-neovim"
+  become: yes
 
 # Install vim-plug
 - block:

@@ -13,6 +13,11 @@ common_apt_packages:
   - build-essential
   - cmake
   - clang-6.0
+  - libbz2-dev
+  - openssl
+  - libssl-dev
+  - libreadline-dev
+  - ctags
 
 # The base directory relative to which user specific configuration files should be stored
 default_xdg_config_home: "{{ ansible_env.HOME }}/.config"

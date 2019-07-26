@@ -5,7 +5,20 @@
     update_cache: yes
   become: yes
 
-- name: Upgrade system deb packages
-  apt:
-    upgrade: safe
-  become: yes
+  # - name: Upgrade system deb packages
+  #   apt:
+  #     upgrade: safe
+  #   become: yes
+
+- block:
+  - name: Ensure en_US.UTF-8 exists
+    locale_gen:
+      name: en_US.UTF-8
+      state: present
+    become: yes
+
+  - name: Ensure zh_TW.UTF-8 exists
+    locale_gen:
+      name: zh_TW.UTF-8
+      state: present
+    become: yes
