@@ -2,3 +2,4 @@
 - hosts: all
   roles:
     - { name: common, tags: dev}
+    - { name: nickjj.docker, tags: docker, become: true}
