@@ -233,6 +233,8 @@ let g:ncm2_pyclang#library_path = '/usr/lib/x86_64-linux-gnu/libclang-6.0.so'
 
 let g:ncm2_pyclang#database_path = []
 
+let g:ncm2_pyclang#args_file_path = ['.clang_complete']
+
 autocmd FileType c,cpp nnoremap <buffer> ;; :<c-u>call ncm2_pyclang#goto_declaration()<cr>
 
 let g:ale_fixers = {
