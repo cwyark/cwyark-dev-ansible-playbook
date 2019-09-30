@@ -1,0 +1,127 @@
+---
+# Install neovim under ubuntu 18.04
+- block:
+  - name: Add neovim ppa
+    apt_repository:
+      repo: "{{ neovim_ppa }}"
+      state: present
+
+  - name: Install neovim from ppa
+    apt:
+      name: "neovim"
+
+  - name: alternate neovim for vi
+    alternatives:
+      name: vi
+      path: /usr/bin/nvim
+
+  - name: alternate neovim for vim
+    alternatives:
+      name: vim
+      path: /usr/bin/nvim
+
+  - name: alternate neovim for editor
+    alternatives:
+      name: editor
+      path: /usr/bin/nvim
+
+  become: yes
+  when: ansible_distribution == "Ubuntu" and ansible_distribution_release == "bionic"
+
+- name: Check pyenv is installed or not
+  shell: command -v pyenv >/dev/null 2>&1
+  register: is_pyenv_exist
+  ignore_errors: yes
+
+- block:
+
+  - name: Check particular python2 version is installed or not
+    stat:
+      path: "{{ ansible_env.HOME }}/.pyenv/versions/{{ neovim_python2_version }}"
+    register: is_particular_python2_installed
+
+  - name: Install particular python2 version by pyenv
+    command: "pyenv install {{ neovim_python2_version }}"
+    when: is_particular_python2_installed.stat.exists == 0
+
+  - name: Check particular python3 version is installed or not
+    stat:
+      path: "{{ ansible_env.HOME }}/.pyenv/versions/{{ neovim_python3_version }}"
+    register: is_particular_python3_installed
+
+  - name: Install particular python3 version by pyenv
+    command: "pyenv install {{ neovim_python3_version }}"
+    when: is_particular_python3_installed.stat.exists == 0
+
+  - name: Check neovim2 virtualenv is installed or not
+    stat:
+      path: "{{ ansible_env.HOME }}/.pyenv/versions/neovim2"
+    register: is_neovim2_installed
+
+  - name: Install virtualenv for neovim python2
+    command: "pyenv virtualenv {{ neovim_python2_version }} neovim2"
+    when: is_neovim2_installed.stat.exists == 0
+
+  - name: Check neovim3 virtualenv is installed or not
+    stat:
+      path: "{{ ansible_env.HOME }}/.pyenv/versions/neovim3"
+    register: is_neovim3_installed
+
+  - name: Install virtualenv for neovim python3
+    command: "pyenv virtualenv {{ neovim_python3_version }} neovim3"
+    when: is_neovim3_installed.stat.exists == 0
+
+  when: is_pyenv_exist.rc == 0
+
+- block:
+  - name: Install neovim on osx
+    homebrew:
+      name: neovim
+  when: ansible_distribution == "MacOSX"
+
+- name: Install clang for code completion under ubuntu
+  apt:
+    name: clang-6.0
+  when: ansible_distribution == "Ubuntu" and ansible_distribution_release == "bionic"
+
+- name: Install python2 modules by neovim2 virtualenv
+  pip:
+    executable: "{{ is_neovim2_installed.stat.path }}/bin/pip"
+    name:
+      - neovim
+  when: is_neovim2_installed.stat.exists == 1
+
+- name: Install python3 modules by neovim3 virtualenv
+  pip:
+    executable: "{{ is_neovim3_installed.stat.path }}/bin/pip"
+    name:
+      - neovim
+      - jedi
+      - autopep8
+      - pylint
+      - ansible-lint
+      - cmakelint
+  when: is_neovim3_installed.stat.exists == 1
+
+# Install vim-plug, common in ubuntu and osx
+- block:
+  - name: Create "{{ neovim_config_dir }}/autoload" autoload directory
+    file:
+      path: "{{ neovim_config_dir }}/autoload"
+      state: directory
+
+  - name: Install vim-plug
+    get_url:
+      url: https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+      dest: "{{ neovim_config_dir }}/autoload/plug.vim"
+      force: yes
+
+# Install custom plugins
+- block:
+  - name: Copy init.vim to target
+    template:
+      src: init.vim.j2
+      dest: "{{ neovim_config_dir }}/init.vim"
+
+  - name: Install vim plugins
+    command: nvim "+silent! PlugInstall!" +qall!

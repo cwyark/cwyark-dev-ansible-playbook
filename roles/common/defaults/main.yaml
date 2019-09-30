@@ -19,11 +19,5 @@ common_apt_packages:
   - libreadline-dev
   - ctags
 
-# The base directory relative to which user specific configuration files should be stored
-default_xdg_config_home: "{{ ansible_env.HOME }}/.config"
-config_dir: "{{ ansible_env.XDG_CONFIG_HOME | default(default_xdg_config_home) }}"
-neovim_ppa: ppa:neovim-ppa/stable
-neovim_config_dir: "{{ config_dir }}/nvim"
-
 pip2_name: pip2
 pip3_name: pip3

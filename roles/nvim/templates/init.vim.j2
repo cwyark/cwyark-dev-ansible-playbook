@@ -9,9 +9,6 @@ Plug 'scrooloose/nerdtree'
 " An easy way to browser tags
 Plug 'majutsushi/tagbar'
 
-" make surrounding fast
-Plug 'tpope/vim-surround'
-
 " you can rapidly find files and open it
 Plug 'kien/ctrlp.vim'
 
@@ -24,42 +21,35 @@ Plug 'altercation/vim-colors-solarized'
 " fast move you cursor
 Plug 'Lokaltog/vim-easymotion'
 
-" make you html faster
-Plug 'mattn/emmet-vim'
-
 " make you write comment faster
 Plug 'scrooloose/nerdcommenter'
 
 " git wrapper
 Plug 'tpope/vim-fugitive'
 
-" watch your undo history
-Plug 'sjl/gundo.vim'
-
-" watch css color in real time
-Plug 'skammer/vim-css-color'
-
+" vim indent guide
 Plug 'nathanaelkane/vim-indent-guides'
 
 " alignment tool
 Plug 'plasticboy/vim-markdown'
 
-Plug 'jansenm/vim-cmake'
-
+" Check syntax in Vim asynchronously and fix files, with Language Server Protocol (LSP) support
 Plug 'w0rp/ale'
 
 " assuming you're using vim-plug: https://github.com/junegunn/vim-plug
 Plug 'ncm2/ncm2'
 
+" Yet Another Remote Plugin Framework for Neovim
 Plug 'roxma/nvim-yarp'
 
-Plug 'sakhnik/nvim-gdb'
+" Neovim thin wrapper for GDB, LLDB and PDB
+Plug 'sakhnik/nvim-gdb', { 'do': ':!./install.sh \| UpdateRemotePlugins' }
 
+" A plugin of NERDTree showing git status flags
 Plug 'Xuyuanp/nerdtree-git-plugin'
 
+" Provide easy code formatting in Vim by integrating existing code formatters.
 Plug 'Chiel92/vim-autoformat'
-
-Plug 'vim-scripts/DoxygenToolkit.vim'
 
 " enable ncm2 for all buffers
 autocmd BufEnter * call ncm2#enable_for_buffer()
@@ -69,15 +59,30 @@ set completeopt=noinsert,menuone,noselect
 
 " NOTE: you need to install completion sources to get completions. Check
 " our wiki page for a list of sources: https://github.com/ncm2/ncm2/wiki
+
+" completion words from current buffer
 Plug 'ncm2/ncm2-bufword'
+
+" completion with words from other tmux panes
 Plug 'ncm2/ncm2-tmux'
+
+" https://github.com/ncm2/ncm2-path
 Plug 'ncm2/ncm2-path'
+
+" neoinclude source for ncm2
 Plug 'ncm2/ncm2-neoinclude' | Plug 'Shougo/neoinclude.vim'
+
+" wrap css omnifunc for ncm2 with one singule function call
 Plug 'ncm2/ncm2-cssomni'
-Plug 'ncm2/ncm2-tern'
+
+" Javascript completion for ncm2.
+Plug 'ncm2/ncm2-tern',  {'do': 'npm install'}
+
+" python completions for ncm2
 Plug 'ncm2/ncm2-jedi'
+
+" Cached, fast C/C++ completion for ncm2
 Plug 'ncm2/ncm2-pyclang'
-Plug 'ncm2/ncm2-go'
 
 " ctags auto gen for nvim
 Plug 'ludovicchabant/vim-gutentags'
@@ -96,10 +101,12 @@ set cursorline
 set history=100
 set winaltkeys=no
 set backspace=2
-" enable full color in vim
 set t_Co=256
 
-"-------------Solarized Colorscheme----
+let g:python_host_prog = $HOME.'/.pyenv/versions/neovim2/bin/python'
+let g:python3_host_prog = $HOME.'/.pyenv/versions/neovim3/bin/python'
+
+"----Solarized Colorscheme----
 syntax on
 if has('gui_running')
     set background=light
@@ -114,14 +121,14 @@ let g:solarized_italic=0
 let g:solarized_visibility="low"
 let g:solarized_contrast="high"
 try
- colorscheme solarized
+  colorscheme solarized
 catch /^Vim\%((\a\+)\)\=:E185/
   colorscheme default
   set background=dark
 endtry
-"---------------------------------------------
+"------------------------------
 
-"----------basic key mapping-------------
+"-------basic key mapping----
 nmap <space> ciw
 nmap 8 <C-W>-
 nmap 2 <C-W>+
@@ -141,19 +148,39 @@ nmap 1 :bprev<CR>
 nmap 2 :bnext<CR>
 nnoremap N Nzz
 nnoremap n nzz
-"-----------------------------------------
+"---------------------------
 
 inoremap <expr><tab> pumvisible() ? "\<c-n>" : "\<tab>"
+inoremap " ""<left>
+inoremap ' ''<left>
+inoremap ( ()<left>
+inoremap [ []<left>
+inoremap { {}<left>
+inoremap {<CR> {<CR>}<ESC>O
+inoremap {;<CR> {<CR>};<ESC>O
 
-"--------------nerdtree--------------------
+
+"-------nerdtree------------
 nnoremap <silent> <F8> :NERDTreeToggle<CR>
 let NERDTreeMapMenu='z'
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
-"------------------------------------------
+let g:NERDTreeIndicatorMapCustom = {
+    \ "Modified"  : "✹",
+    \ "Staged"    : "✚",
+    \ "Untracked" : "✭",
+    \ "Renamed"   : "➜",
+    \ "Unmerged"  : "═",
+    \ "Deleted"   : "✖",
+    \ "Dirty"     : "✗",
+    \ "Clean"     : "✔︎",
+    \ "Unknown"   : "?"
+    \ }
+"---------------------------
 
-"---------------nerdcommenter-------------
-let g:NERDCustomDelimiters = { 'c': { 'left': '/* ','right': ' */' } }
-"-----------------------------------------
+"------nerdcommenter-------
+let g:NERDSpaceDelims = 1
+let g:NERDTrimTrailingWhitespace = 1
+"---------------------------
 
 "---------------tagbar--------------------
 nnoremap <silent> <F7> :TagbarToggle<CR>
@@ -165,20 +192,12 @@ let g:gutentags_ctags_tagfile = '.tags'
 let s:vim_tags = expand('~/.cache/tags')
 let g:gutentags_cache_dir = s:vim_tags
 if !isdirectory(s:vim_tags)
-   silent! call mkdir(s:vim_tags, 'p')
- endif
+  silent! call mkdir(s:vim_tags, 'p')
+endif
 let g:gutentags_ctags_extra_args = ['--fields=+niazS', '--extra=+q']
 let g:gutentags_ctags_extra_args += ['--c++-kinds=+pxI']
 let g:gutentags_ctags_extra_args += ['--c-kinds=+px']
 "-----------------------------------------
-
-inoremap " ""<left>
-inoremap ' ''<left>
-inoremap ( ()<left>
-inoremap [ []<left>
-inoremap { {}<left>
-inoremap {<CR> {<CR>}<ESC>O
-inoremap {;<CR> {<CR>};<ESC>O
 
 "--------------ctrlp---------------------
 let g:ctrlp_working_path_mode = 'a'
@@ -207,44 +226,39 @@ let g:airline_powerline_fonts = 1
 let g:EasyMotion_leader_key = 'q'
 "----------------------------------
 
-"--------emmet---------------------
-let g:user_emmet_leader_key='<C-M>'
-let g:user_emmet_install_global = 0
-autocmd FileType html,css,scss EmmetInstall
-"----------------------------------
-"
-"-----------------gundo--------------------------------
-nnoremap <silent> <F5> :GundoToggle<CR>
-let g:gundo_width = 30
-let g:gundo_preview_height = 40
-let g:gundo_right = 1
-"------------------------------------------------------
-"
-let g:vim_markdown_folding_disabled = 1
-
+"--------ALE---------------
 let g:ale_linters = {
-\   'c++': ['clang'],
+\   'cpp': ['clang'],
 \   'c': ['clang'],
-\   'python': ['pylint'],
+\   'python': ['pylint', 'flake8'],
+\   'javascript': ['eslint'],
+\   'ansible': ['ansible_lint'],
+\   'cmake': ['cmakelint'],
 \}
+let g:ale_fixers = {
+\   '*': ['remove_trailing_lines', 'trim_whitespace'],
+\   'javascript': ['prettier', 'eslint'],
+\   'python': ['autopep8', 'yapf'],
+\}
+let g:ale_fix_on_save = 1
+"--------------------------
 
-"let g:ncm2_pyclang#library_path = '/usr/local/Cellar/llvm/7.0.0_1/lib/libclang.dylib'
+"---------pyclang complete------
+{% if ansible_distribution == "Ubuntu" %}
 let g:ncm2_pyclang#library_path = '/usr/lib/x86_64-linux-gnu/libclang-6.0.so.1'
+{% elif ansible_distribution == "MacOSX" %}
+let g:ncm2_pyclang#library_path = '/Library/Developer/CommandLineTools/usr/lib/libclang.dylib'
+{% else %}
+{% endif %}
 
 let g:ncm2_pyclang#database_path = []
 
 let g:ncm2_pyclang#args_file_path = ['.clang_complete']
 
 autocmd FileType c,cpp nnoremap <buffer> ;; :<c-u>call ncm2_pyclang#goto_declaration()<cr>
+"-------------------------------
 
-let g:ale_fixers = {
-\   '*': ['remove_trailing_lines', 'trim_whitespace'],
-\}
-
-let g:ale_fix_on_save = 1
-
-
-" ctags
+"---------- ctags -----------
 let g:gutentags_project_root = ['.root', '.svn', '.git', '.project']
 
 let g:gutentags_ctags_tagfile = '.tags'
@@ -262,33 +276,4 @@ let g:gutentags_ctags_extra_args += ['--c++-kinds=+pxI']
 let g:gutentags_ctags_extra_args += ['--c-kinds=+px']
 
 set statusline+=%{gutentags#statusline()}
-
-let g:NERDTreeIndicatorMapCustom = {
-    \ "Modified"  : "✹",
-    \ "Staged"    : "✚",
-    \ "Untracked" : "✭",
-    \ "Renamed"   : "➜",
-    \ "Unmerged"  : "═",
-    \ "Deleted"   : "✖",
-    \ "Dirty"     : "✗",
-    \ "Clean"     : "✔︎",
-    \ "Unknown"   : "?"
-    \ }
-
-
-" for C++ style, change the '@' to '\'
-let g:DoxygenToolkit_commentType = "C++"
-let g:DoxygenToolkit_briefTag_pre = "\\brief "
-let g:DoxygenToolkit_templateParamTag_pre = "\\tparam "
-let g:DoxygenToolkit_paramTag_pre = "\\param "
-let g:DoxygenToolkit_returnTag = "\\return "
-let g:DoxygenToolkit_throwTag_pre = "\\throw " " @exception is also valid
-let g:DoxygenToolkit_fileTag = "\\file "
-let g:DoxygenToolkit_dateTag = "\\date "
-let g:DoxygenToolkit_authorTag = "\\author "
-let g:DoxygenToolkit_versionTag = "\\version "
-let g:DoxygenToolkit_blockTag = "\\name "
-let g:DoxygenToolkit_classTag = "\\class "
-let g:DoxygenToolkit_authorName = "YuSheng Tseng, chester.tseng@adlinktech.com"
-let g:doxygen_enhanced_color = 1
-"let g:load_doxygen_syntax = 1
+"--------------------------------
